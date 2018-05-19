@@ -21,24 +21,25 @@ module.exports = class MpgPayModel extends BaseModel {
         this.RespondType = "JSON";
 
         /**
-
-         */
-        this.Version = "1.2";
-
-        /**
-
-         */
-        this.CheckValue = "";
-
-        /**
             時間戳記
             V
             Varchar(50)
             例：2014-05-15 15:00:00(+08:00 時區)這個時間的時間戳記為1400137200。
          */
-        this.TimeStamp = new Date().getTime();
+        this.TimeStamp = Math.floor(Date.now() / 1000).toString();
 
-        this.LangType = "zh-tw";
+        /**
+
+         */
+        this.Version = "1.4";
+
+        /**
+            語系
+            Varchar(5)
+            1.設定 MPG 頁面顯示的文字語系。英文版參數為 en 繁體中文版參數為 zh-tw
+            2.當未提供此參數或此參數數值錯誤時，將預設為繁體中文版。
+         */
+        this.LangType = "zh-tw"
 
         /**
             商店訂單編號
@@ -177,7 +178,17 @@ module.exports = class MpgPayModel extends BaseModel {
             3. 同時開啟多期別，將此參數用 ”，”(半 形)分隔，例如： 分隔，例如： 3,6,9，代表開啟 分 3、 6、9 期的功能。
             4. 此欄位值 此欄位值 =０或無值時，即代表不開啟分期
          */
-        this.InsFlag = "";
+        this.InstFlag = "";
+
+        /**
+            信用卡
+            紅利啟用
+            Int(1)
+            1.設定是否啟用信用卡紅利支付方式。
+              1 =啟用
+              0 或者未有此參數=不啟用
+         */
+        this.CreditRed = 0;
 
         /**
             信用卡
@@ -223,17 +234,38 @@ module.exports = class MpgPayModel extends BaseModel {
         this.BARCODE = 0;
 
         /**
+            Pay2go 電子錢包啟用
+            Int(1)
+            1.設定是否啟用 Pay2go 電子錢包支付方式。
+              1 = 啟用
+              0 或者未有此參數，即代表不開啟。
+         */
+        this.P2G = 0;
+
+        /**
+            物流啟用
+            Int(1)
+            1.使用前，須先登入智付通會員專區啟用物流並設定退貨門市與取貨人相關資訊。
+              1 = 超商取貨不付款
+              2 = 超商取貨付款
+              3 = 超商取貨不付款及超商取貨付款
+              0 或者未有此參數，即代表不開啟。
+            2.當該筆訂單金額小於 30 元或大於 2 萬元時，即使此參數設定為啟用，MPG 付款頁面仍不會顯示此支付方式選項。
+         */
+        this.CVSCOM = 0;
+
+        /**
             自訂支付啟用
             Int(1)
             1.設定是否啟用自訂支付支付方式
             1=啟用 0或者未有此參數，即代表不開啟。
          */
-        this.CUSTOM = 0;
+        //this.CUSTOM = 0;
 
         /**
          付款人綁定信用卡資料
          */
-        this.TokenTerm = "";
+        //this.TokenTerm = "";
         this.mappingFrom(data);
     }
 };

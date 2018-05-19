@@ -1,5 +1,5 @@
 const logger = require("../lib/logger");
-const log = logger.createLog("PeriodicalService");
+const log = logger.createLog("MpgService");
 
 const ValidationHelper = require("../lib/validation.helper");
 const payFormGenerator = require("../lib/payform.generator");
@@ -44,10 +44,22 @@ class MpgService {
         model.Version = model.Version || spApiVersion;
         model.MerchantID = this.config.MerchantID;
 
-        model.TokenTerm = shaEncrypt.encrypt(model.Email).toUpperCase();
-        model.CheckValue = this.validationHelper.genMpgCheckValue(model.Amt, model.MerchantOrderNo, model.TimeStamp, model.Version);
-        log.debug("payModel", payModel);
-        let html = payFormGenerator(model, this.apiUrl);
+        //model.TokenTerm = shaEncrypt.encrypt(model.Email).toUpperCase();
+        //model.CheckValue = this.validationHelper.genMpgCheckValue(model.Amt, model.MerchantOrderNo, model.TimeStamp, model.Version);
+
+        let tradeInfo = this.validationHelper.genTradeInfo(model);
+        let tradeSha = this.validationHelper.genTradeSha(tradeInfo);
+
+        let finalModel = {
+            MerchantID: model.MerchantID,
+            Version: model.Version,
+            TradeInfo: tradeInfo,
+            TradeSha: tradeSha,
+        };
+
+        log.debug("model", model);
+        log.debug("finalModel", finalModel);
+        let html = payFormGenerator(finalModel, this.apiUrl);
         log.debug("payFormHtml", html);
         return html;
     }

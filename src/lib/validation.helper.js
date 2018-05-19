@@ -1,11 +1,69 @@
 const SHA256 = require("./sha256");
 const DataChainGenerator = require("./data.chain.generator");
+const aes = require('aes-js')
+const crypto = require('crypto')
 
 class ValidationHelper {
 
     constructor(config) {
         this.config = config;
         this.sha256 = new SHA256();
+    }
+
+    genTradeInfo(payload) {
+		let data = []
+        Object.keys(payload).forEach(key => {
+            data.push(`${key}=${encodeURIComponent(payload[key])}`)
+        })
+
+        let cbc = new aes.ModeOfOperation.cbc(Buffer.from(this.config.HashKey), Buffer.from(this.config.HashIV))
+        let info = aes.utils.hex.fromBytes(cbc.encrypt(aes.utils.utf8.toBytes(this.padding(data.join('&')))))
+        return info;
+    }
+
+    genTradeSha(tradeInfo) {
+        if (!tradeInfo) return null;
+        return crypto.createHash('sha256')
+            .update(`HashKey=${this.config.HashKey}&${tradeInfo}&HashIV=${this.config.HashIV}`)
+            .digest('hex')
+            .toUpperCase();
+    }
+
+    padding(str) {
+        var len = str.length
+        var pad = 32 - (len % 32)
+        str += String.fromCharCode(pad).repeat(pad)
+        return str
+    }
+
+    removePadding(plaintext) {
+        var len = 0
+        for (var i = plaintext.length - 1; i >= 0; i--) {
+            if (plaintext[i] === '}') break
+            len++
+        }
+
+        return plaintext.substr(0, plaintext.length - len)
+    }
+
+    decrypt(key, iv, data) {
+        let cbc = new aes.ModeOfOperation.cbc(Buffer.from(key), Buffer.from(iv))
+        //console.log('IANXXX 1 cbc:', cbc);
+
+        let encryptedBytes = aes.utils.hex.toBytes(data)
+        //console.log('IANXXX 2 encryptedBytes:', encryptedBytes);
+
+        let decryptedBytes = cbc.decrypt(encryptedBytes)
+        //console.log('IANXXX 3 decryptedBytes:', decryptedBytes);
+
+        let plaintext = aes.utils.utf8.fromBytes(decryptedBytes)
+        //console.log('IANXXX 4 plaintext:', plaintext);
+
+        let plaintextNoPad = this.removePadding(plaintext);
+        //console.log('IANXXX 5 plaintextNoPad:', plaintextNoPad);
+
+        //return plaintextNoPad;
+        return plaintext;
     }
 
     /**

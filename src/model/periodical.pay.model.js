@@ -22,7 +22,7 @@ module.exports = class PeriodicalPayModel extends BaseModel {
             Varchar(50)
             例：2014-05-15 15:00:00(+08:00 時區)這個時間的時間戳記為1400137200。
          */
-        this.TimeStamp = new Date().getTime();
+        this.TimeStamp = Math.floor(Date.now() / 1000).toString();
 
         /**
 
@@ -64,7 +64,7 @@ module.exports = class PeriodicalPayModel extends BaseModel {
 
             2.每張委託單，每個期別僅能授權一次，若需授權多次，請建立多張委託單。
          */
-        this.PeriodType = "";
+        this.PeriodType = "M";
 
         /**
          * 週期授權時間
@@ -76,7 +76,7 @@ module.exports = class PeriodicalPayModel extends BaseModel {
             4.當週期參數為Y時，此欄位值格式為MMDD。
             例：每年的3月15號執行授權，則此欄位值為0315；若於1年內需授權多次，請以建立多張委託單方式執行。
          */
-        this.PeriodPoint = "";
+        this.PeriodPoint = "01";
 
         /**
          *  檢查卡號模式
@@ -90,7 +90,7 @@ module.exports = class PeriodicalPayModel extends BaseModel {
             例：授權週期為W（週），於週二時建立一張授權時間為週二的委託單，當此參數為2時，則於建立當日立即執行首期金額授權，若此參數為1或3時，則於次週二執行首期金額授權。
             5.本參數為個別單一存在，不會有並存的狀態。
          */
-        this.PeriodStartType = "";
+        this.PeriodStartType = 1;
 
         /**
          *  授權期數
@@ -98,7 +98,7 @@ module.exports = class PeriodicalPayModel extends BaseModel {
             2.若授權期數大於信用卡到期日，則以信用卡到期日為最終期數。
             例：授權週期為M（月），於2016/10/1建立委託單，授權期數為12，而付款人之信用卡到期月/年為12/16時，則此張委託單之授權期數為3，2016/10月、11月、12月，共3期。
          */
-        this.PeriodTimes = 0;
+        this.PeriodTimes = 12;
 
         /**
             1.當付款人首次執行信用卡授權交易完成後，以 Form Post 方式導回商店頁面。
@@ -128,7 +128,7 @@ module.exports = class PeriodicalPayModel extends BaseModel {
                 0=不可修改
             2.當未提供此參數時，將預設為可修改。
          */
-        this.EmailModify = 0;
+        this.EmailModify = 1;
 
         /**
             是否開啟付款人資訊
@@ -140,7 +140,7 @@ module.exports = class PeriodicalPayModel extends BaseModel {
             2.若未提供此參數，則預設為是。
             3.付款人資訊填寫欄位包含付款人姓名、付款人電話、付款人手機。
          */
-        this.PaymentInfo = "N";
+        this.PaymentInfo = "Y";
 
         /**
           是否開啟收件人資訊
@@ -150,7 +150,7 @@ module.exports = class PeriodicalPayModel extends BaseModel {
           2.若未提供此參數，則預設為是。
           3.收件人資訊填寫欄位包含收件人姓名、收件人電話、收件人手機、收件人地址。
          */
-        this.OrderInfo = "N";
+        this.OrderInfo = "Y";
 
         /**
             每期授權結果通知
